@@ -33,18 +33,18 @@ public abstract class ContaBancaria {
     //     this.saldo = saldo;
     // }
 
-    public void sacar(Double valor) {
+    public Double sacar(Double valor) {
         if (saldo < valor) {
             throw new ContaException("Sem saldo");
         }
-        saldo -= valor;
+        return saldo -= valor;
     }
 
-    public void depositar(Double valor) {
+    public Double depositar(Double valor) {
         if (valor <= 0) {
             throw new ContaException("Insira uma quantidade válida");
         }
-        saldo += valor;
+        return saldo += valor;
     }
 
     @Override
