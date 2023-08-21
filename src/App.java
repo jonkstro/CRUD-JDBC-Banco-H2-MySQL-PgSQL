@@ -160,22 +160,6 @@ public final class App {
         System.out.println("");
     }
 
-    private static void update(Scanner sc, List<ContaPoupanca> contas, Statement st, ResultSet rs) throws SQLException {
-        read(contas, st, rs);
-        System.out.print("Selecione um número da conta para atualizar: ");
-        int id = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Digite a nova taxa de Juros: ");
-        Double taxaJuros = sc.nextDouble();
-        sc.nextLine();
-
-        String query = "UPDATE contas SET taxa_juros = " + taxaJuros + " WHERE numero =" + id;
-        st.executeUpdate(query);
-
-        System.out.println("Atualizado com sucesso!!!");
-        System.out.println("");
-    }
-
     private static void delete(Scanner sc, List<ContaPoupanca> contas, Statement st, ResultSet rs) throws SQLException {
         read(contas, st, rs);
         System.out.print("Selecione um número da conta para excluir: ");
@@ -187,6 +171,36 @@ public final class App {
 
         System.out.println("Removido conta com sucesso!!!");
         System.out.println("");
+    }
+
+    private static void update(Scanner sc, List<ContaPoupanca> contas, Statement st, ResultSet rs) throws SQLException {
+        read(contas, st, rs);
+        System.out.print("Selecione um número da conta para atualizar: ");
+        int id = sc.nextInt();
+        sc.nextLine();
+        System.out.print("Digite a nova taxa de Juros: ");
+        Double taxaJuros = sc.nextDouble();
+        if (taxaJuros < 0 || taxaJuros > 1) {
+            throw new ContaException("Taxa de juros não deve ser menor que 0 nem maior que 1");
+        }
+        sc.nextLine();
+
+        boolean find = false;
+        String query = "";
+        for (ContaPoupanca c : contas) {
+            if (c.getNumeroConta() == id) {
+                find = true;
+                query = "UPDATE contas SET taxa_juros = " + taxaJuros + " WHERE numero =" + id;
+            }
+        }
+
+        if (find == true) {
+            st.executeUpdate(query);
+            System.out.println("Atualizado com sucesso!!!");
+            System.out.println("");
+        } else {
+            System.out.println("Conta não localizada");
+        }
     }
 
     private static void read(List<ContaPoupanca> contas, Statement st, ResultSet rs) throws SQLException {
@@ -244,7 +258,7 @@ public final class App {
 
     private static void createTable(Statement st) throws SQLException {
         String query = "CREATE TABLE IF NOT EXISTS contas (" +
-                "numero INTEGER PRIMARY KEY, saldo DOUBLE NOT NULL, taxa_juros DOUBLE NOT NULL);";
+                "numero INTEGER PRIMARY KEY, saldo NUMERIC NOT NULL, taxa_juros NUMERIC NOT NULL);";
         st.execute(query);
     }
 }
